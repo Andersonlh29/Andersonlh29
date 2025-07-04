@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sudoku con p5.js</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #193b40;
+    }
+
+    #welcome {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    #welcome h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color: #FFFFFF;
+    }
+
+    #welcome p {
+      margin-bottom: 20px;
+      font-size: 1.2em;
+      color: #FFFFFF;
+    }
+
+    button {
+      margin: 8px;
+      padding: 12px 24px;
+      font-size: 1em;
+      cursor: pointer;
+      color: #273746;
+      border: 2px solid #193b40;
+    }
+
+    #sudoku-container {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    canvas {
+      border: 2px solid #333;
+      display: block;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="welcome">
+    <h1>Bienvenido a Sudoku</h1>
+    <p>Ejercita tu mente y diviértete.</p>
+    <p>Seleccione el nivel de juego:</p>
+    <button onclick="startGame('facil')">Fácil</button>
+    <button onclick="startGame('medio')">Medio</button>
+    <button onclick="startGame('avanzado')">Avanzado</button>
+  </div>
+
+  <div id="sudoku-container"></div>
+
+  <script src="sketch.js"></script>
+</body>
+</html>
+
+
