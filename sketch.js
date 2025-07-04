@@ -6,12 +6,23 @@ let status = [];
 let cols = 9;
 let rows = 9;
 let cellSize = 50;
+
 let selectedCell = { i: -1, j: -1 };
 let showBoard = false;
 
-// Sonidos
-let soundError;
-let soundCorrecto;
+let marginX, marginY;
+let canvasWidth = 900;
+let canvasHeight = 600;
+
+let soundError, soundCorrecto;
+
+// Cronómetro
+let startTime;
+
+let currentLevel = 'facil';
+
+// Botones p5
+let backButton, restartButton;
 
 function preload() {
   soundFormats('mp3', 'wav');
@@ -20,9 +31,13 @@ function preload() {
 }
 
 function startGame(level) {
+  currentLevel = level;
+
   document.getElementById('welcome').style.display = 'none';
   document.getElementById('sudoku-container').style.display = 'block';
   showBoard = true;
+
+  startTime = millis();
 
   grid = [];
   solution = [];
@@ -113,10 +128,28 @@ function startGame(level) {
       }
     }
   }
+
+  marginX = (canvasWidth - cols * cellSize) / 2;
+  marginY = (canvasHeight - rows * cellSize) / 2 + 30;
+
+  createButtons();
+}
+
+function createButtons() {
+  if (backButton) backButton.remove();
+  if (restartButton) restartButton.remove();
+
+  backButton = createButton('Atrás');
+  backButton.position((windowWidth / 2) + 100, 50);
+  backButton.mousePressed(backToMenu);
+
+  restartButton = createButton('Reiniciar');
+  restartButton.position((windowWidth / 2) + 200, 50);
+  restartButton.mousePressed(restartGame);
 }
 
 function setup() {
-  let canvas = createCanvas(cols * cellSize, rows * cellSize);
+  let canvas = createCanvas(canvasWidth, canvasHeight);
   canvas.parent('sudoku-container');
 }
 
@@ -124,14 +157,27 @@ function draw() {
   background(255);
   if (showBoard) {
     drawGrid();
+    drawTimer();
   }
+}
+
+function drawTimer() {
+  let elapsed = floor((millis() - startTime) / 1000);
+  let minutes = nf(floor(elapsed / 60), 2);
+  let seconds = nf(elapsed % 60, 2);
+  let timerText = `${minutes}:${seconds}`;
+
+  fill(0);
+  textAlign(CENTER);
+  textSize(25);
+  text(`Tiempo: ${timerText}`, width / 3, 63);
 }
 
 function drawGrid() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
-      let x = i * cellSize;
-      let y = j * cellSize;
+      let x = marginX + i * cellSize;
+      let y = marginY + j * cellSize;
 
       stroke(0);
       strokeWeight(1);
@@ -145,7 +191,6 @@ function drawGrid() {
 
       if (grid[i][j] !== 0) {
         let numColor = 0;
-
         if (status[i][j] === "prefilled") {
           numColor = color(0);
         } else if (status[i][j] === "correcto") {
@@ -165,8 +210,8 @@ function drawGrid() {
   strokeWeight(3);
   for (let i = 0; i <= cols; i++) {
     if (i % 3 === 0) {
-      line(i * cellSize, 0, i * cellSize, height);
-      line(0, i * cellSize, width, i * cellSize);
+      line(marginX + i * cellSize, marginY, marginX + i * cellSize, marginY + rows * cellSize);
+      line(marginX, marginY + i * cellSize, marginX + cols * cellSize, marginY + i * cellSize);
     }
   }
 }
@@ -174,8 +219,8 @@ function drawGrid() {
 function mousePressed() {
   if (!showBoard) return;
 
-  let i = floor(mouseX / cellSize);
-  let j = floor(mouseY / cellSize);
+  let i = floor((mouseX - marginX) / cellSize);
+  let j = floor((mouseY - marginY) / cellSize);
 
   if (i >= 0 && i < cols && j >= 0 && j < rows) {
     if (prefilled[i][j] === 0) {
@@ -211,3 +256,16 @@ function keyPressed() {
     }
   }
 }
+
+function backToMenu() {
+  showBoard = false;
+  if (backButton) backButton.remove();
+  if (restartButton) restartButton.remove();
+  document.getElementById('sudoku-container').style.display = 'none';
+  document.getElementById('welcome').style.display = 'flex';
+}
+
+function restartGame() {
+  startGame(currentLevel);
+}
+
