@@ -14,7 +14,6 @@ let soundError;
 let soundCorrecto;
 
 function preload() {
-  // Carga los sonidos
   soundFormats('mp3', 'wav');
   soundError = loadSound('error-126627.mp3');
   soundCorrecto = loadSound('new-notification-07-210334.mp3');
@@ -23,7 +22,6 @@ function preload() {
 function startGame(level) {
   document.getElementById('welcome').style.display = 'none';
   document.getElementById('sudoku-container').style.display = 'block';
-
   showBoard = true;
 
   grid = [];
@@ -53,6 +51,54 @@ function startGame(level) {
       [5,1,9, 3,2,6, 8,7,4],
       [2,4,8, 9,5,7, 1,3,6],
       [7,6,3, 4,1,8, 2,5,9],
+    ];
+  } else if (level === 'medio') {
+    prefilled = [
+      [0,2,0, 6,0,8, 0,0,0],
+      [5,8,0, 0,0,9, 7,0,0],
+      [0,0,0, 0,4,0, 0,0,0],
+      [3,7,0, 0,0,0, 5,0,0],
+      [6,0,0, 0,0,0, 0,0,4],
+      [0,0,8, 0,0,0, 0,1,3],
+      [0,0,0, 0,2,0, 0,0,0],
+      [0,0,9, 8,0,0, 0,3,6],
+      [0,0,0, 3,0,6, 0,9,0],
+    ];
+
+    solution = [
+      [1,2,3, 6,7,8, 9,4,5],
+      [5,8,4, 2,1,9, 7,6,3],
+      [9,6,7, 5,4,3, 1,2,8],
+      [3,7,2, 4,6,1, 5,8,9],
+      [6,9,1, 7,8,5, 3,2,4],
+      [4,5,8, 9,3,2, 6,1,7],
+      [8,3,6, 1,2,4, 9,5,7],
+      [2,1,9, 8,5,7, 4,3,6],
+      [7,4,5, 3,9,6, 2,7,1],
+    ];
+  } else if (level === 'avanzado') {
+    prefilled = [
+      [0,0,5, 3,0,0, 0,0,0],
+      [8,0,0, 0,0,0, 0,2,0],
+      [0,7,0, 0,1,0, 5,0,0],
+      [4,0,0, 0,0,5, 3,0,0],
+      [0,1,0, 0,7,0, 0,0,6],
+      [0,0,3, 2,0,0, 0,8,0],
+      [0,6,0, 5,0,0, 0,0,9],
+      [0,0,4, 0,0,0, 0,3,0],
+      [0,0,0, 0,0,9, 7,0,0],
+    ];
+
+    solution = [
+      [1,4,5, 3,2,7, 6,9,8],
+      [8,3,9, 6,5,4, 1,2,7],
+      [6,7,2, 9,1,8, 5,4,3],
+      [4,9,6, 1,8,5, 3,7,2],
+      [2,1,8, 4,7,3, 9,5,6],
+      [7,5,3, 2,9,6, 4,8,1],
+      [3,6,7, 5,4,2, 8,1,9],
+      [9,8,4, 7,6,1, 2,3,5],
+      [5,2,1, 8,3,9, 7,6,4],
     ];
   }
 
@@ -158,10 +204,10 @@ function keyPressed() {
         soundError.play();
       }
     }
+
     if (key === '0' || key === 'Backspace') {
       grid[selectedCell.i][selectedCell.j] = 0;
       status[selectedCell.i][selectedCell.j] = "vacio";
     }
   }
 }
-
