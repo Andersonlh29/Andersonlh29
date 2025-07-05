@@ -140,11 +140,11 @@ function createButtons() {
   if (restartButton) restartButton.remove();
 
   backButton = createButton('Atrás');
-  backButton.position((windowWidth / 2) + 70, 50);
+  backButton.position((windowWidth / 2) + 50, 50);
   backButton.mousePressed(backToMenu);
 
   restartButton = createButton('Reiniciar');
-  restartButton.position((windowWidth / 2) + 170, 50);
+  restartButton.position((windowWidth / 2) + 150, 50);
   restartButton.mousePressed(restartGame);
 }
 
