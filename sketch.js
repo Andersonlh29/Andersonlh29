@@ -151,7 +151,7 @@ function createButtons() {
   backButton.style('color', '#00FF00');
 
   restartButton = createButton('Reiniciar');
-  restartButton.position(730, 415);
+  restartButton.position(830, 415);
   restartButton.mousePressed(restartGame);
   restartButton.style('background-color', '#000000');
   restartButton.style('border', '2px solid #00FF00');
