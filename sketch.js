@@ -302,7 +302,7 @@ function keyPressed() {
   if (!showBoard || errores >= 5) return;
 
   if (selectedCell.i !== -1 && selectedCell.j !== -1) {
-    // Si la celda ya está marcada como correcta o prefilled, no se puede modificar
+    // Si la celda ya está correcta o prefilled, no se debe modificar ni borrar
     if (status[selectedCell.i][selectedCell.j] === "correcto" || status[selectedCell.i][selectedCell.j] === "prefilled") {
       return;
     }
@@ -314,6 +314,9 @@ function keyPressed() {
       if (n === solution[selectedCell.i][selectedCell.j]) {
         status[selectedCell.i][selectedCell.j] = "correcto";
         soundCorrecto.play();
+        // Bloquea celda quitando la selección
+        selectedCell.i = -1;
+        selectedCell.j = -1;
       } else {
         status[selectedCell.i][selectedCell.j] = "incorrecto";
         soundError.play();
