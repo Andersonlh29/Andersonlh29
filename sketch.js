@@ -312,17 +312,28 @@ function drawTimer() {
 
 
 function drawErrores() {
-  fill('#00FF00');
   textAlign(RIGHT);
   textSize(20);
+
+  // Texto "Errores:" en rojo con borde verde LED
+  stroke('#00FF00'); // Borde LED verde
+  strokeWeight(1.5);
+  fill('#FF0000');   // Relleno rojo
   text(`Errores:`, 830, 290);
+
+  // Número de errores en rojo con borde verde LED
   text(`${errores}`, 800, 320);
+
+  noStroke(); // Desactiva borde para otros textos
 
   if (errores >= 5) {
     textSize(26);
     fill('#FF0000');
+    stroke('#00FF00');
+    strokeWeight(1.5);
     textAlign(CENTER);
-    text("Juego terminado. Máximo de errores alcanzado.\nReinicie el juego.", width / 2, height - 50);
+    text("Juego terminado. Intentos fallidos al máximo.\nReinicie el juego.", width / 2, height - 50);
+    noStroke();
   }
 
   if (gameOverTime) {
