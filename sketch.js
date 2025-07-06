@@ -441,29 +441,34 @@ function mousePressed() {
   }
 }
 function keyPressed() {
-  if (!showBoard || errores >= 5 || timeOver) return;
+  if (!showBoard || errores >= 5 || gameOverTime) return;
 
-  if (selectedCell.i !== -1 && selectedCell.j !== -1) {
-    let n = int(key);
+  // Solo funciona si hay celda seleccionada
+  let i = selectedCell.i;
+  let j = selectedCell.j;
+
+  if (i !== -1 && j !== -1) {
+    let n = parseInt(key);
 
     if (n >= 1 && n <= 9) {
-      // Verificar solución
-      if (n === solution[selectedCell.i][selectedCell.j]) {
-        grid[selectedCell.i][selectedCell.j] = n;
-        status[selectedCell.i][selectedCell.j] = "correcto"; // 🔒 Bloquear celda
+      if (n === solution[i][j]) {
+        // Número correcto → Bloquear
+        grid[i][j] = n;
+        status[i][j] = "correcto";
         soundCorrecto.play();
       } else {
-        grid[selectedCell.i][selectedCell.j] = 0; // No guardar número malo
+        // Número incorrecto → No guardar
+        grid[i][j] = 0;
         soundError.play();
         errores++;
       }
     }
 
-    if (key === '0' || key === 'Backspace') {
-      // Solo borrar si NO está bloqueada por correcto
-      if (status[selectedCell.i][selectedCell.j] !== "correcto") {
-        grid[selectedCell.i][selectedCell.j] = 0;
-        status[selectedCell.i][selectedCell.j] = "vacio";
+    if (key === '0' || keyCode === BACKSPACE || keyCode === DELETE) {
+      // Solo borrar si no está correcto
+      if (status[i][j] !== "correcto" && status[i][j] !== "prefilled") {
+        grid[i][j] = 0;
+        status[i][j] = "vacio";
       }
     }
   }
