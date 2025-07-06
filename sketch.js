@@ -142,10 +142,24 @@ function createButtons() {
   backButton = createButton('Atrás');
   backButton.position((windowWidth / 2) + 50, 50);
   backButton.mousePressed(backToMenu);
+  backButton.style('background-color', '#000000');
+  backButton.style('border', '2px solid #00FF00');
+  backButton.style('color', '#00FF00');
+  backButton.style('padding', '8px 16px');
+  backButton.style('font-size', '16px');
+  backButton.style('overflow', 'hidden');
+  backButton.style('white-space', 'nowrap');
 
   restartButton = createButton('Reiniciar');
   restartButton.position((windowWidth / 2) + 150, 50);
   restartButton.mousePressed(restartGame);
+  restartButton.style('background-color', '#000000');
+  restartButton.style('border', '2px solid #00FF00');
+  restartButton.style('color', '#00FF00');
+  restartButton.style('padding', '8px 16px');
+  restartButton.style('font-size', '16px');
+  restartButton.style('overflow', 'hidden');
+  restartButton.style('white-space', 'nowrap');
 }
 
 function setup() {
@@ -154,7 +168,8 @@ function setup() {
 }
 
 function draw() {
-  background(255);
+  background(0); // Fondo negro LED
+
   if (showBoard) {
     drawGrid();
     drawTimer();
@@ -167,7 +182,7 @@ function drawTimer() {
   let seconds = nf(elapsed % 60, 2);
   let timerText = `${minutes}:${seconds}`;
 
-  fill(0);
+  fill('#00FF00');
   textAlign(CENTER);
   textSize(25);
   text(`Tiempo: ${timerText}`, width / 3, 63);
@@ -185,18 +200,18 @@ function drawGrid() {
       rect(x, y, cellSize, cellSize);
 
       if (selectedCell.i === i && selectedCell.j === j) {
-        fill(200, 200, 255, 100);
+        fill(0, 255, 0, 50);
         rect(x, y, cellSize, cellSize);
       }
 
       if (grid[i][j] !== 0) {
-        let numColor = 0;
+        let numColor = '#000000';
         if (status[i][j] === "prefilled") {
-          numColor = color(0);
+          numColor = '#000000';
         } else if (status[i][j] === "correcto") {
-          numColor = color(0, 180, 0);
+          numColor = '#00FF00';
         } else if (status[i][j] === "incorrecto") {
-          numColor = color(220, 0, 0);
+          numColor = '#FF0000';
         }
 
         fill(numColor);
@@ -207,6 +222,7 @@ function drawGrid() {
     }
   }
 
+  stroke('#00FF00');
   strokeWeight(3);
   for (let i = 0; i <= cols; i++) {
     if (i % 3 === 0) {
@@ -268,4 +284,3 @@ function backToMenu() {
 function restartGame() {
   startGame(currentLevel);
 }
-
