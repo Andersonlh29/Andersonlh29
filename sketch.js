@@ -424,13 +424,14 @@ function drawGrid() {
 }
 
 function mousePressed() {
-  if (!showBoard || errores >= 5 || gameOverTime) return;
+  if (!showBoard || errores >= 5 || timeOver) return;
 
   let i = floor((mouseX - marginX) / cellSize);
   let j = floor((mouseY - marginY) / cellSize);
 
   if (i >= 0 && i < cols && j >= 0 && j < rows) {
-    if (status[i][j] === "vacio") {
+    // ✅ Solo puedes seleccionar si NO está bloqueada (prefilled o correcto)
+    if (status[i][j] !== "prefilled" && status[i][j] !== "correcto") {
       selectedCell.i = i;
       selectedCell.j = j;
     } else {
@@ -439,7 +440,6 @@ function mousePressed() {
     }
   }
 }
-
 function keyPressed() {
   if (!showBoard || errores >= 5 || timeOver) return;
 
@@ -448,18 +448,16 @@ function keyPressed() {
     if (n >= 1 && n <= 9) {
       if (n === solution[selectedCell.i][selectedCell.j]) {
         grid[selectedCell.i][selectedCell.j] = n;
-        status[selectedCell.i][selectedCell.j] = "correcto";
-        prefilled[selectedCell.i][selectedCell.j] = n; // ✅ Solo aquí se bloquea si es correcto
+        status[selectedCell.i][selectedCell.j] = "correcto"; // ✅ bloquea aquí
         soundCorrecto.play();
       } else {
-        status[selectedCell.i][selectedCell.j] = "incorrecto";
+        grid[selectedCell.i][selectedCell.j] = 0; // no guardar errado
         soundError.play();
         errores++;
       }
     }
 
     if (key === '0' || key === 'Backspace') {
-      // ✅ Permitir borrar solo si NO está correcto
       if (status[selectedCell.i][selectedCell.j] !== "correcto") {
         grid[selectedCell.i][selectedCell.j] = 0;
         status[selectedCell.i][selectedCell.j] = "vacio";
@@ -467,6 +465,7 @@ function keyPressed() {
     }
   }
 }
+
 
 
 function checkTimeLimit() {
