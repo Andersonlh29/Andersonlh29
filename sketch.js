@@ -16,17 +16,12 @@ let canvasHeight = 600;
 
 let soundError, soundCorrecto;
 
-// Cronómetro
 let startTime;
-let tiempoMaximo = 0;
+let gameOverTime = false;
 
-// Contador de errores
 let errores = 0;
-
 let currentLevel = 'facil';
-let juegoTerminado = false;
 
-// Botones p5
 let backButton, restartButton;
 
 // === 6 puzzles por nivel ===
@@ -266,75 +261,10 @@ const puzzlesAvanzado = [
 
 ];
 
-// === Resto del código ===
-// Igual que antes, con startGame usando `random(puzzlesFacil)` etc.
 function preload() {
   soundFormats('mp3', 'wav');
   soundError = loadSound('error-126627.mp3');
   soundCorrecto = loadSound('new-notification-07-210334.mp3');
-}
-
-function startGame(level) {
-  currentLevel = level;
-  document.getElementById('welcome').style.display = 'none';
-  document.getElementById('sudoku-container').style.display = 'block';
-  showBoard = true;
-
-  // Tiempo máximo según nivel
-  if (level === 'facil') tiempoMaximo = 10 * 60 * 1000;
-  if (level === 'medio') tiempoMaximo = 13 * 60 * 1000;
-  if (level === 'avanzado') tiempoMaximo = 15 * 60 * 1000;
-
-  startTime = millis();
-  errores = 0;
-  juegoTerminado = false;
-
-  // Elegir puzzle aleatorio
-  let puzzle;
-  if (level === 'facil') puzzle = random(puzzlesFacil);
-  else if (level === 'medio') puzzle = random(puzzlesMedio);
-  else if (level === 'avanzado') puzzle = random(puzzlesAvanzado);
-
-  prefilled = puzzle.prefilled;
-  solution = puzzle.solution;
-
-  // Inicializar
-  for (let i = 0; i < cols; i++) {
-    grid[i] = [];
-    status[i] = [];
-    for (let j = 0; j < rows; j++) {
-      grid[i][j] = prefilled[i][j];
-      if (prefilled[i][j] !== 0) {
-        status[i][j] = "prefilled";
-      } else {
-        status[i][j] = "vacio";
-      }
-    }
-  }
-
-  marginX = (canvasWidth - cols * cellSize) / 2;
-  marginY = (canvasHeight - rows * cellSize) / 2 + 30;
-
-  createButtons();
-}
-
-function createButtons() {
-  if (backButton) backButton.remove();
-  if (restartButton) restartButton.remove();
-
-  backButton = createButton('Atrás');
-  backButton.position(400, 50);
-  backButton.mousePressed(backToMenu);
-  backButton.style('background-color', '#000');
-  backButton.style('border', '2px solid #00FF00');
-  backButton.style('color', '#00FF00');
-
-  restartButton = createButton('Reiniciar');
-  restartButton.position(530, 50);
-  restartButton.mousePressed(restartGame);
-  restartButton.style('background-color', '#000');
-  restartButton.style('border', '2px solid #00FF00');
-  restartButton.style('color', '#00FF00');
 }
 
 function setup() {
@@ -351,6 +281,7 @@ function draw() {
     drawTimer();
     drawErrores();
     drawSudokuTitle();
+    checkTimeLimit();
   }
 }
 
@@ -362,27 +293,23 @@ function drawMainBorder() {
 }
 
 function drawTimer() {
-  let elapsed = millis() - startTime;
-  let remaining = tiempoMaximo - elapsed;
+  let elapsed = floor((millis() - startTime) / 1000);
+  let limit = 600; // fácil por defecto
+  if (currentLevel === "facil") limit = 600;
+  else if (currentLevel === "medio") limit = 780;
+  else if (currentLevel === "avanzado") limit = 900;
 
-  if (!juegoTerminado && remaining <= 0) {
-    juegoTerminado = true;
-    fill('#FF0000');
-    textAlign(CENTER);
-    textSize(26);
-    text("Tiempo terminado. Reinicie el juego.", width / 2, height - 50);
-  }
-
-  let seconds = floor(max(remaining, 0) / 1000);
-  let minutes = nf(floor(seconds / 60), 2);
-  let secs = nf(seconds % 60, 2);
-  let timerText = `${minutes}:${secs}`;
+  let remaining = max(0, limit - elapsed);
+  let minutes = nf(floor(remaining / 60), 2);
+  let seconds = nf(remaining % 60, 2);
+  let timerText = `${minutes}:${seconds}`;
 
   fill('#00FF00');
   textAlign(CENTER);
   textSize(25);
-  text(`Tiempo: ${timerText}`, width / 3, 63);
+  text(`⏳ Tiempo: ${timerText}`, width / 3, 63);
 }
+
 
 function drawErrores() {
   fill('#00FF00');
@@ -391,12 +318,18 @@ function drawErrores() {
   text(`Errores:`, 830, 290);
   text(`${errores}`, 800, 320);
 
-  if (errores >= 5 && !juegoTerminado) {
-    juegoTerminado = true;
+  if (errores >= 5) {
+    textSize(26);
     fill('#FF0000');
     textAlign(CENTER);
+    text("Juego terminado. Máximo de errores alcanzado.\nReinicie el juego.", width / 2, height - 50);
+  }
+
+  if (gameOverTime) {
     textSize(26);
-    text("Juego terminado. Máximo de fallos.\nReinicie el juego.", width / 2, height - 50);
+    fill('#FF0000');
+    textAlign(CENTER);
+    text("Tiempo agotado.\nReinicie el juego.", width / 2, height - 100);
   }
 }
 
@@ -411,7 +344,7 @@ function drawSudokuTitle() {
   textSize(letterHeight * 0.7);
 
   for (let i = 0; i < letters.length; i++) {
-    text(letters[i], 115, marginY + letterHeight * i + letterHeight / 2);
+    text(letters[i], 100, marginY + letterHeight * i + letterHeight / 2);
   }
 }
 
@@ -460,7 +393,7 @@ function drawGrid() {
 }
 
 function mousePressed() {
-  if (!showBoard || errores >= 5 || juegoTerminado) return;
+  if (!showBoard || errores >= 5 || gameOverTime) return;
 
   let i = floor((mouseX - marginX) / cellSize);
   let j = floor((mouseY - marginY) / cellSize);
@@ -477,7 +410,7 @@ function mousePressed() {
 }
 
 function keyPressed() {
-  if (!showBoard || errores >= 5 || juegoTerminado) return;
+  if (!showBoard || errores >= 5 || gameOverTime) return;
 
   if (selectedCell.i !== -1 && selectedCell.j !== -1) {
     let n = int(key);
@@ -487,18 +420,96 @@ function keyPressed() {
         status[selectedCell.i][selectedCell.j] = "correcto";
         soundCorrecto.play();
       } else {
+        grid[selectedCell.i][selectedCell.j] = n;
+        status[selectedCell.i][selectedCell.j] = "incorrecto";
         soundError.play();
         errores++;
-        status[selectedCell.i][selectedCell.j] = "incorrecto";
       }
     }
     if (key === '0' || key === 'Backspace') {
-      if (status[selectedCell.i][selectedCell.j] === "incorrecto") {
+      if (status[selectedCell.i][selectedCell.j] !== "correcto") {
         grid[selectedCell.i][selectedCell.j] = 0;
         status[selectedCell.i][selectedCell.j] = "vacio";
       }
     }
   }
+}
+
+function checkTimeLimit() {
+  let elapsed = (millis() - startTime) / 1000;
+  let limit = 600; // fácil por defecto
+  if (currentLevel === "facil") limit = 600;
+  else if (currentLevel === "medio") limit = 780;
+  else if (currentLevel === "avanzado") limit = 900;
+
+  if (elapsed >= limit) {
+    gameOverTime = true;
+  }
+}
+
+
+function startGame(level) {
+  currentLevel = level;
+
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('sudoku-container').style.display = 'block';
+  showBoard = true;
+
+  startTime = millis();
+  errores = 0;
+  gameOverTime = false;
+
+  grid = [];
+  solution = [];
+  status = [];
+
+  let puzzles;
+  if (level === 'facil') puzzles = puzzlesFacil;
+  else if (level === 'medio') puzzles = puzzlesMedio;
+  else puzzles = puzzlesAvanzado;
+
+  let randomIndex = floor(random(puzzles.length));
+  let chosen = puzzles[randomIndex];
+
+  prefilled = chosen.prefilled;
+  solution = chosen.solution;
+
+  for (let i = 0; i < cols; i++) {
+    grid[i] = [];
+    status[i] = [];
+    for (let j = 0; j < rows; j++) {
+      grid[i][j] = prefilled[i][j];
+      if (prefilled[i][j] !== 0) {
+        status[i][j] = "prefilled";
+      } else {
+        status[i][j] = "vacio";
+      }
+    }
+  }
+
+  marginX = (canvasWidth - cols * cellSize) / 2;
+  marginY = (canvasHeight - rows * cellSize) / 2 + 30;
+
+  createButtons();
+}
+
+function createButtons() {
+  if (backButton) backButton.remove();
+  if (restartButton) restartButton.remove();
+
+  backButton = createButton('Atrás');
+  backButton.position(700, 50);
+  backButton.mousePressed(backToMenu);
+  backButton.style('background-color', '#000000');
+  backButton.style('border', '2px solid #00FF00');
+  backButton.style('color', '#00FF00');
+
+  restartButton = createButton('Reiniciar');
+  restartButton.position(830, 50);
+  restartButton.mousePressed(restartGame);
+  restartButton.style('background-color', '#000000');
+  restartButton.style('border', '2px solid #00FF00');
+  restartButton.style('color', '#00FF00');
 }
 
 function backToMenu() {
