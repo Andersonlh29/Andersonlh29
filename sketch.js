@@ -19,7 +19,7 @@ let soundError, soundCorrecto;
 // Cronómetro
 let startTime;
 
-// Nueva variable: contador de errores
+// Contador de errores
 let errores = 0;
 
 let currentLevel = 'facil';
@@ -41,7 +41,7 @@ function startGame(level) {
   showBoard = true;
 
   startTime = millis();
-  errores = 0; // Reiniciar contador de errores
+  errores = 0;
 
   grid = [];
   solution = [];
@@ -144,14 +144,14 @@ function createButtons() {
   if (restartButton) restartButton.remove();
 
   backButton = createButton('Atrás');
-  backButton.position( 400, 50);
+  backButton.position(400, 50);
   backButton.mousePressed(backToMenu);
   backButton.style('background-color', '#000000');
   backButton.style('border', '2px solid #00FF00');
   backButton.style('color', '#00FF00');
 
   restartButton = createButton('Reiniciar');
-  restartButton.position( 530, 50);
+  restartButton.position(530, 50);
   restartButton.mousePressed(restartGame);
   restartButton.style('background-color', '#000000');
   restartButton.style('border', '2px solid #00FF00');
@@ -167,36 +167,73 @@ function draw() {
   background(0);
 
   if (showBoard) {
+    drawMainBorder();
     drawGrid();
     drawTimer();
     drawErrores();
+    drawSudokuTitle();
   }
+}
+
+function drawMainBorder() {
+  noFill();
+  stroke('#00FF00');
+  strokeWeight(4);
+  rect(20, 20, canvasWidth - 40, canvasHeight - 40);
 }
 
 function drawTimer() {
   let elapsed = floor((millis() - startTime) / 1000);
   let minutes = nf(floor(elapsed / 60), 2);
   let seconds = nf(elapsed % 60, 2);
-  let timerText = `${minutes}:${seconds}`;
 
-  fill('#00FF00');
+  // Efecto parpadeo de los dos puntos
+  let showColon = millis() % 1000 < 500 ? ':' : ' ';
+  let timerText = `${minutes}${showColon}${seconds}`;
+
+  // Efecto pulso dinámico
+  let pulse = map(sin(millis() / 500), -1, 1, 180, 255);
+
+  push();
+  fill(0, pulse, 0); // Pulso verde
   textAlign(CENTER);
-  textSize(25);
-  text(`Tiempo: ${timerText}`, width / 3, 63);
+  textSize(32);
+
+  // Sombra tipo LED glow
+  drawingContext.shadowBlur = 20;
+  drawingContext.shadowColor = '#00FF00';
+
+  text(`Tiempo ${timerText}`, width / 3, 63);
+  pop();
 }
 
 function drawErrores() {
   fill('#00FF00');
-  textAlign(LEFT);
+  textAlign(RIGHT);
   textSize(20);
-  text(`Errores:`, 60, 270);
-  text(`${errores}`, 86, 300);
+  text(`Errores:`, 830, 290);
+  text(`${errores}`, 800, 320);
 
   if (errores >= 5) {
     textSize(26);
     fill('#FF0000');
     textAlign(CENTER);
     text("Juego terminado. Intentos fallidos al máximo.\nReinicie el juego.", width / 2, height - 50);
+  }
+}
+
+function drawSudokuTitle() {
+  fill('#00FF00');
+  textAlign(CENTER, CENTER);
+
+  let totalHeight = rows * cellSize;
+  let letters = ['S', 'U', 'D', 'O', 'K', 'U'];
+  let letterHeight = totalHeight / letters.length;
+
+  textSize(letterHeight * 0.7);
+
+  for (let i = 0; i < letters.length; i++) {
+    text(letters[i], 115, marginY + letterHeight * i + letterHeight / 2);
   }
 }
 
@@ -273,7 +310,7 @@ function keyPressed() {
         status[selectedCell.i][selectedCell.j] = "correcto";
         soundCorrecto.play();
       } else {
-        status[selectedCell.i][selectedCell.j] = "incorrecto";
+status[selectedCell.i][selectedCell.j] = "incorrecto";
         soundError.play();
         errores++;
       }
@@ -297,5 +334,3 @@ function backToMenu() {
 function restartGame() {
   startGame(currentLevel);
 }
-
-
