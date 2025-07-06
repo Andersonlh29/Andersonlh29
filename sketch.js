@@ -77,7 +77,7 @@ const puzzlesFacil = [
   },
   // Puzzle 3
   {
-  puzzle: [
+  prefilled: [
     [0, 0, 3, 0, 2, 0, 6, 0, 0],
     [9, 0, 0, 3, 0, 5, 0, 0, 1],
     [0, 0, 1, 8, 0, 6, 4, 0, 0],
@@ -312,7 +312,7 @@ function drawTimer() {
 
 function drawErrores() {
   textAlign(RIGHT);
-  textSize(20);
+  textSize(24);
 
   // Texto "Errores:" en rojo con borde verde LED
   stroke('#00FF00'); // Borde LED verde
