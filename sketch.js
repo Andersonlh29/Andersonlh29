@@ -144,14 +144,14 @@ function createButtons() {
   if (restartButton) restartButton.remove();
 
   backButton = createButton('Atrás');
-  backButton.position((windowWidth / 2) + 50, 50);
+  backButton.position((windowWidth / 2) + 30, 50);
   backButton.mousePressed(backToMenu);
   backButton.style('background-color', '#000000');
   backButton.style('border', '2px solid #00FF00');
   backButton.style('color', '#00FF00');
 
   restartButton = createButton('Reiniciar');
-  restartButton.position((windowWidth / 2) + 160, 50);
+  restartButton.position((windowWidth / 2) + 130, 50);
   restartButton.mousePressed(restartGame);
   restartButton.style('background-color', '#000000');
   restartButton.style('border', '2px solid #00FF00');
