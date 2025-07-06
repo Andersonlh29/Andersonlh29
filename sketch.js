@@ -430,8 +430,8 @@ function mousePressed() {
   let j = floor((mouseY - marginY) / cellSize);
 
   if (i >= 0 && i < cols && j >= 0 && j < rows) {
-    // Revisa que NO sea prefilled y NO sea correcto
-    if (status[i][j] === "vacio" || status[i][j] === "incorrecto") {
+    // Permitir solo si no es prefilled y no está correcto
+    if (status[i][j] !== "prefilled" && status[i][j] !== "correcto") {
       selectedCell.i = i;
       selectedCell.j = j;
     } else {
@@ -447,18 +447,20 @@ function keyPressed() {
     let n = int(key);
 
     if (n >= 1 && n <= 9) {
+      // Verificar solución
       if (n === solution[selectedCell.i][selectedCell.j]) {
         grid[selectedCell.i][selectedCell.j] = n;
-        status[selectedCell.i][selectedCell.j] = "correcto"; // BLOQUEAR SOLO CORRECTO
+        status[selectedCell.i][selectedCell.j] = "correcto"; // 🔒 Bloquear celda
         soundCorrecto.play();
       } else {
-        // No se guarda el número errado para no bloquear la celda
+        grid[selectedCell.i][selectedCell.j] = 0; // No guardar número malo
         soundError.play();
         errores++;
       }
     }
 
     if (key === '0' || key === 'Backspace') {
+      // Solo borrar si NO está bloqueada por correcto
       if (status[selectedCell.i][selectedCell.j] !== "correcto") {
         grid[selectedCell.i][selectedCell.j] = 0;
         status[selectedCell.i][selectedCell.j] = "vacio";
@@ -466,8 +468,6 @@ function keyPressed() {
     }
   }
 }
-
-
 
 function checkTimeLimit() {
   let elapsed = (millis() - startTime) / 1000;
