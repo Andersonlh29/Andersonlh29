@@ -19,6 +19,9 @@ let soundError, soundCorrecto;
 // Cronómetro
 let startTime;
 
+// Nueva variable: contador de errores
+let errores = 0;
+
 let currentLevel = 'facil';
 
 // Botones p5
@@ -38,6 +41,7 @@ function startGame(level) {
   showBoard = true;
 
   startTime = millis();
+  errores = 0; // Reiniciar contador de errores
 
   grid = [];
   solution = [];
@@ -145,21 +149,13 @@ function createButtons() {
   backButton.style('background-color', '#000000');
   backButton.style('border', '2px solid #00FF00');
   backButton.style('color', '#00FF00');
-  backButton.style('padding', '8px 16px');
-  backButton.style('font-size', '16px');
-  backButton.style('overflow', 'hidden');
-  backButton.style('white-space', 'nowrap');
 
   restartButton = createButton('Reiniciar');
-  restartButton.position((windowWidth / 2) + 150, 50);
+  restartButton.position((windowWidth / 2) + 160, 50);
   restartButton.mousePressed(restartGame);
   restartButton.style('background-color', '#000000');
   restartButton.style('border', '2px solid #00FF00');
   restartButton.style('color', '#00FF00');
-  restartButton.style('padding', '8px 16px');
-  restartButton.style('font-size', '16px');
-  restartButton.style('overflow', 'hidden');
-  restartButton.style('white-space', 'nowrap');
 }
 
 function setup() {
@@ -168,11 +164,12 @@ function setup() {
 }
 
 function draw() {
-  background(0); // Fondo negro LED
+  background(0);
 
   if (showBoard) {
     drawGrid();
     drawTimer();
+    drawErrores();
   }
 }
 
@@ -186,6 +183,21 @@ function drawTimer() {
   textAlign(CENTER);
   textSize(25);
   text(`Tiempo: ${timerText}`, width / 3, 63);
+}
+
+function drawErrores() {
+  fill('#00FF00');
+  textAlign(LEFT);
+  textSize(20);
+  text(`Errores:`, 60, 270);
+  text(`${errores}`, 86, 300);
+
+  if (errores >= 5) {
+    textSize(26);
+    fill('#FF0000');
+    textAlign(CENTER);
+    text("Juego terminado. Intentos fallidos al máximo.\nReinicie el juego.", width / 2, height - 50);
+  }
 }
 
 function drawGrid() {
@@ -205,13 +217,13 @@ function drawGrid() {
       }
 
       if (grid[i][j] !== 0) {
-        let numColor = '#000000';
+        let numColor = 0;
         if (status[i][j] === "prefilled") {
-          numColor = '#000000';
+          numColor = color(0);
         } else if (status[i][j] === "correcto") {
-          numColor = '#00FF00';
+          numColor = color(0, 180, 0);
         } else if (status[i][j] === "incorrecto") {
-          numColor = '#FF0000';
+          numColor = color(220, 0, 0);
         }
 
         fill(numColor);
@@ -233,7 +245,7 @@ function drawGrid() {
 }
 
 function mousePressed() {
-  if (!showBoard) return;
+  if (!showBoard || errores >= 5) return;
 
   let i = floor((mouseX - marginX) / cellSize);
   let j = floor((mouseY - marginY) / cellSize);
@@ -250,7 +262,7 @@ function mousePressed() {
 }
 
 function keyPressed() {
-  if (!showBoard) return;
+  if (!showBoard || errores >= 5) return;
 
   if (selectedCell.i !== -1 && selectedCell.j !== -1) {
     let n = int(key);
@@ -263,6 +275,7 @@ function keyPressed() {
       } else {
         status[selectedCell.i][selectedCell.j] = "incorrecto";
         soundError.play();
+        errores++;
       }
     }
 
