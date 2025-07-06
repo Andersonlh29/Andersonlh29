@@ -441,7 +441,7 @@ function mousePressed() {
 }
 
 function keyPressed() {
-  if (!showBoard || errores >= 5 || gameOverTime) return;
+  if (!showBoard || errores >= 5 || timeOver) return;
 
   if (selectedCell.i !== -1 && selectedCell.j !== -1) {
     let n = int(key);
@@ -449,15 +449,17 @@ function keyPressed() {
       if (n === solution[selectedCell.i][selectedCell.j]) {
         grid[selectedCell.i][selectedCell.j] = n;
         status[selectedCell.i][selectedCell.j] = "correcto";
+        prefilled[selectedCell.i][selectedCell.j] = n; // ✅ Solo aquí se bloquea si es correcto
         soundCorrecto.play();
       } else {
-        grid[selectedCell.i][selectedCell.j] = n;
         status[selectedCell.i][selectedCell.j] = "incorrecto";
         soundError.play();
         errores++;
       }
     }
+
     if (key === '0' || key === 'Backspace') {
+      // ✅ Permitir borrar solo si NO está correcto
       if (status[selectedCell.i][selectedCell.j] !== "correcto") {
         grid[selectedCell.i][selectedCell.j] = 0;
         status[selectedCell.i][selectedCell.j] = "vacio";
@@ -465,6 +467,7 @@ function keyPressed() {
     }
   }
 }
+
 
 function checkTimeLimit() {
   let elapsed = (millis() - startTime) / 1000;
