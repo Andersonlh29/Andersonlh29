@@ -18,15 +18,256 @@ let soundError, soundCorrecto;
 
 // Cronómetro
 let startTime;
+let tiempoMaximo = 0;
 
 // Contador de errores
 let errores = 0;
 
 let currentLevel = 'facil';
+let juegoTerminado = false;
 
 // Botones p5
 let backButton, restartButton;
 
+// === 6 puzzles por nivel ===
+const puzzlesFacil = [
+  {
+    prefilled: [
+      [0,0,0,2,6,0,7,0,1],
+      [6,8,0,0,7,0,0,9,0],
+      [1,9,0,0,0,4,5,0,0],
+      [8,2,0,1,0,0,0,4,0],
+      [0,0,4,6,0,2,9,0,0],
+      [0,5,0,0,0,3,0,2,8],
+      [0,0,9,3,0,0,0,7,4],
+      [0,4,0,0,5,0,0,3,6],
+      [7,0,3,0,1,8,0,0,0],
+    ],
+    solution: [
+      [4,3,5,2,6,9,7,8,1],
+      [6,8,2,5,7,1,4,9,3],
+      [1,9,7,8,3,4,5,6,2],
+      [8,2,6,1,9,5,3,4,7],
+      [3,7,4,6,8,2,9,1,5],
+      [9,5,1,7,4,3,6,2,8],
+      [5,1,9,3,2,6,8,7,4],
+      [2,4,8,9,5,7,1,3,6],
+      [7,6,3,4,1,8,2,5,9],
+    ]
+  },
+  // Puzzle 2
+  {
+    prefilled: [
+      [0,6,0,1,0,4,0,5,0],
+      [0,0,8,3,0,5,6,0,0],
+      [2,0,0,0,0,0,0,0,1],
+      [8,0,0,4,0,7,0,0,6],
+      [0,0,6,0,0,0,3,0,0],
+      [7,0,0,9,0,1,0,0,4],
+      [5,0,0,0,0,0,0,0,2],
+      [0,0,7,2,0,6,9,0,0],
+      [0,4,0,5,0,8,0,7,0],
+    ],
+    solution: [
+      [9,6,3,1,7,4,2,5,8],
+      [1,7,8,3,2,5,6,4,9],
+      [2,5,4,6,8,9,7,3,1],
+      [8,2,1,4,3,7,5,9,6],
+      [4,9,6,8,5,2,3,1,7],
+      [7,3,5,9,6,1,8,2,4],
+      [5,8,9,7,1,3,4,6,2],
+      [3,1,7,2,4,6,9,8,5],
+      [6,4,2,5,9,8,1,7,3],
+    ]
+  },
+  // Puzzle 3
+  {
+    prefilled: [
+      [0,0,0,0,0,0,0,1,2],
+      [0,0,0,0,0,0,7,0,0],
+      [0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,5,0,0,0],
+      [0,0,0,1,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0],
+      [3,0,0,0,0,0,0,0,0],
+      [0,4,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0],
+    ],
+    solution: [
+      [5,7,4,6,3,9,8,1,2],
+      [2,3,1,8,5,7,7,4,6],
+      [6,8,9,4,2,1,3,5,7],
+      [1,2,3,7,4,5,6,9,8],
+      [4,6,5,1,9,8,2,7,3],
+      [7,9,8,2,6,3,1,2,5],
+      [3,1,6,5,7,2,9,8,4],
+      [8,4,2,9,1,6,5,3,7],
+      [9,5,7,3,8,4,4,6,1],
+    ]
+  },
+  
+  // Puzzle 4,5,6 puedes replicar otros para llenar
+];
+
+const puzzlesMedio = [
+  {
+    prefilled: [
+      [0,2,0,6,0,8,0,0,0],
+      [5,8,0,0,0,9,7,0,0],
+      [0,0,0,0,4,0,0,0,0],
+      [3,7,0,0,0,0,5,0,0],
+      [6,0,0,0,0,0,0,0,4],
+      [0,0,8,0,0,0,0,1,3],
+      [0,0,0,0,2,0,0,0,0],
+      [0,0,9,8,0,0,0,3,6],
+      [0,0,0,3,0,6,0,9,0],
+    ],
+    solution: [
+      [1,2,3,6,7,8,9,4,5],
+      [5,8,4,2,1,9,7,6,3],
+      [9,6,7,5,4,3,1,2,8],
+      [3,7,2,4,6,1,5,8,9],
+      [6,9,1,7,8,5,3,2,4],
+      [4,5,8,9,3,2,6,1,7],
+      [8,3,6,1,2,4,9,5,7],
+      [2,1,9,8,5,7,4,3,6],
+      [7,4,5,3,9,6,2,7,1],
+    ]
+  },
+  // Puzzle Medio #2
+{
+  prefilled: [
+    [0,0,0, 2,0,0, 0,6,3],
+    [3,0,0, 0,0,5, 4,0,1],
+    [0,0,1, 0,0,3, 9,8,0],
+    [0,0,0, 0,0,0, 0,9,0],
+    [0,0,0, 5,3,8, 0,0,0],
+    [0,3,0, 0,0,0, 0,0,0],
+    [0,2,6, 3,0,0, 5,0,0],
+    [5,0,3, 7,0,0, 0,0,8],
+    [4,7,0, 0,0,1, 0,0,0],
+  ],
+  solution: [
+    [7,5,4, 2,1,9, 8,6,3],
+    [3,9,8, 6,7,5, 4,2,1],
+    [2,6,1, 8,4,3, 9,8,7],
+    [1,8,5, 4,2,6, 3,9,7],
+    [6,4,2, 5,3,8, 1,7,9],
+    [9,3,7, 1,9,7, 2,5,4],
+    [8,2,6, 3,9,4, 5,1,7],
+    [5,1,3, 7,6,2, 7,4,8],
+    [4,7,9, 9,5,1, 6,3,2],
+  ]
+},
+
+// Puzzle Medio #3
+{
+  prefilled: [
+    [0,6,0, 1,0,4, 0,5,0],
+    [0,0,8, 3,0,5, 6,0,0],
+    [2,0,0, 0,0,0, 0,0,1],
+    [8,0,0, 4,0,7, 0,0,6],
+    [0,0,6, 0,0,0, 3,0,0],
+    [7,0,0, 9,0,1, 0,0,4],
+    [5,0,0, 0,0,0, 0,0,2],
+    [0,0,7, 2,0,6, 9,0,0],
+    [0,4,0, 5,0,8, 0,7,0],
+  ],
+  solution: [
+    [9,6,3, 1,7,4, 2,5,8],
+    [1,7,8, 3,2,5, 6,4,9],
+    [2,5,4, 6,8,9, 7,3,1],
+    [8,2,1, 4,3,7, 5,9,6],
+    [4,9,6, 8,5,2, 3,1,7],
+    [7,3,5, 9,6,1, 8,2,4],
+    [5,8,9, 7,1,3, 4,6,2],
+    [3,1,7, 2,4,6, 9,8,5],
+    [6,4,2, 5,9,8, 1,7,3],
+  ]
+},
+];
+
+const puzzlesAvanzado = [
+  {
+    prefilled: [
+      [0,0,5,3,0,0,0,0,0],
+      [8,0,0,0,0,0,0,2,0],
+      [0,7,0,0,1,0,5,0,0],
+      [4,0,0,0,0,5,3,0,0],
+      [0,1,0,0,7,0,0,0,6],
+      [0,0,3,2,0,0,0,8,0],
+      [0,6,0,5,0,0,0,0,9],
+      [0,0,4,0,0,0,0,3,0],
+      [0,0,0,0,0,9,7,0,0],
+    ],
+    solution: [
+      [1,4,5,3,2,7,6,9,8],
+      [8,3,9,6,5,4,1,2,7],
+      [6,7,2,9,1,8,5,4,3],
+      [4,9,6,1,8,5,3,7,2],
+      [2,1,8,4,7,3,9,5,6],
+      [7,5,3,2,9,6,4,8,1],
+      [3,6,7,5,4,2,8,1,9],
+      [9,8,4,7,6,1,2,3,5],
+      [5,2,1,8,3,9,7,6,4],
+    ]
+  },
+  // Puzzle Avanzado #2
+{
+  prefilled: [
+    [0,0,0, 0,0,0, 0,1,2],
+    [0,0,0, 0,0,0, 7,0,0],
+    [5,0,0, 0,9,0, 0,0,0],
+    [0,0,0, 0,0,2, 0,0,0],
+    [0,0,0, 5,0,7, 0,0,0],
+    [0,0,0, 6,0,0, 0,0,0],
+    [0,0,0, 0,8,0, 0,0,7],
+    [0,0,6, 0,0,0, 0,0,0],
+    [1,2,0, 0,0,0, 0,0,0],
+  ],
+  solution: [
+    [7,6,9, 4,3,8, 5,1,2],
+    [2,1,8, 9,7,5, 7,6,3],
+    [5,4,3, 2,9,1, 8,7,6],
+    [6,9,7, 1,4,2, 3,8,5],
+    [3,8,1, 5,6,7, 2,4,9],
+    [4,5,2, 6,8,3, 1,9,7],
+    [9,3,5, 8,2,4, 6,5,7],
+    [8,7,6, 3,5,9, 4,2,1],
+    [1,2,4, 7,1,6, 9,3,8],
+  ]
+},
+
+// Puzzle Avanzado #3
+{
+  prefilled: [
+    [0,0,0, 0,0,0, 0,0,9],
+    [0,0,0, 0,0,4, 5,0,0],
+    [0,0,1, 0,0,0, 0,0,0],
+    [0,0,0, 0,0,0, 0,0,0],
+    [0,7,0, 0,5,0, 0,3,0],
+    [0,0,0, 0,0,0, 0,0,0],
+    [0,0,0, 0,0,0, 7,0,0],
+    [0,0,9, 1,0,0, 0,0,0],
+    [4,0,0, 0,0,0, 0,0,0],
+  ],
+  solution: [
+    [5,4,7, 6,3,2, 1,8,9],
+    [9,2,3, 5,7,4, 5,6,1],
+    [6,8,1, 9,8,1, 3,2,7],
+    [1,3,2, 7,9,5, 6,4,8],
+    [8,7,6, 2,5,1, 9,3,4],
+    [2,9,5, 4,6,3, 8,7,1],
+    [3,1,4, 8,2,9, 7,5,6],
+    [7,6,9, 1,4,8, 2,9,5],
+    [4,5,8, 3,1,7, 5,1,2],
+  ]
+},
+
+];
+
+// === Resto del código ===
+// Igual que antes, con startGame usando `random(puzzlesFacil)` etc.
 function preload() {
   soundFormats('mp3', 'wav');
   soundError = loadSound('error-126627.mp3');
@@ -35,100 +276,38 @@ function preload() {
 
 function startGame(level) {
   currentLevel = level;
-
   document.getElementById('welcome').style.display = 'none';
   document.getElementById('sudoku-container').style.display = 'block';
   showBoard = true;
 
+  // Tiempo máximo según nivel
+  if (level === 'facil') tiempoMaximo = 10 * 60 * 1000;
+  if (level === 'medio') tiempoMaximo = 13 * 60 * 1000;
+  if (level === 'avanzado') tiempoMaximo = 15 * 60 * 1000;
+
   startTime = millis();
   errores = 0;
+  juegoTerminado = false;
 
-  grid = [];
-  solution = [];
-  status = [];
+  // Elegir puzzle aleatorio
+  let puzzle;
+  if (level === 'facil') puzzle = random(puzzlesFacil);
+  else if (level === 'medio') puzzle = random(puzzlesMedio);
+  else if (level === 'avanzado') puzzle = random(puzzlesAvanzado);
 
-  if (level === 'facil') {
-    prefilled = [
-      [0,0,0, 2,6,0, 7,0,1],
-      [6,8,0, 0,7,0, 0,9,0],
-      [1,9,0, 0,0,4, 5,0,0],
-      [8,2,0, 1,0,0, 0,4,0],
-      [0,0,4, 6,0,2, 9,0,0],
-      [0,5,0, 0,0,3, 0,2,8],
-      [0,0,9, 3,0,0, 0,7,4],
-      [0,4,0, 0,5,0, 0,3,6],
-      [7,0,3, 0,1,8, 0,0,0],
-    ];
+  prefilled = puzzle.prefilled;
+  solution = puzzle.solution;
 
-    solution = [
-      [4,3,5, 2,6,9, 7,8,1],
-      [6,8,2, 5,7,1, 4,9,3],
-      [1,9,7, 8,3,4, 5,6,2],
-      [8,2,6, 1,9,5, 3,4,7],
-      [3,7,4, 6,8,2, 9,1,5],
-      [9,5,1, 7,4,3, 6,2,8],
-      [5,1,9, 3,2,6, 8,7,4],
-      [2,4,8, 9,5,7, 1,3,6],
-      [7,6,3, 4,1,8, 2,5,9],
-    ];
-  } else if (level === 'medio') {
-    prefilled = [
-      [0,2,0, 6,0,8, 0,0,0],
-      [5,8,0, 0,0,9, 7,0,0],
-      [0,0,0, 0,4,0, 0,0,0],
-      [3,7,0, 0,0,0, 5,0,0],
-      [6,0,0, 0,0,0, 0,0,4],
-      [0,0,8, 0,0,0, 0,1,3],
-      [0,0,0, 0,2,0, 0,0,0],
-      [0,0,9, 8,0,0, 0,3,6],
-      [0,0,0, 3,0,6, 0,9,0],
-    ];
-
-    solution = [
-      [1,2,3, 6,7,8, 9,4,5],
-      [5,8,4, 2,1,9, 7,6,3],
-      [9,6,7, 5,4,3, 1,2,8],
-      [3,7,2, 4,6,1, 5,8,9],
-      [6,9,1, 7,8,5, 3,2,4],
-      [4,5,8, 9,3,2, 6,1,7],
-      [8,3,6, 1,2,4, 9,5,7],
-      [2,1,9, 8,5,7, 4,3,6],
-      [7,4,5, 3,9,6, 2,7,1],
-    ];
-  } else if (level === 'avanzado') {
-    prefilled = [
-      [0,0,5, 3,0,0, 0,0,0],
-      [8,0,0, 0,0,0, 0,2,0],
-      [0,7,0, 0,1,0, 5,0,0],
-      [4,0,0, 0,0,5, 3,0,0],
-      [0,1,0, 0,7,0, 0,0,6],
-      [0,0,3, 2,0,0, 0,8,0],
-      [0,6,0, 5,0,0, 0,0,9],
-      [0,0,4, 0,0,0, 0,3,0],
-      [0,0,0, 0,0,9, 7,0,0],
-    ];
-
-    solution = [
-      [1,4,5, 3,2,7, 6,9,8],
-      [8,3,9, 6,5,4, 1,2,7],
-      [6,7,2, 9,1,8, 5,4,3],
-      [4,9,6, 1,8,5, 3,7,2],
-      [2,1,8, 4,7,3, 9,5,6],
-      [7,5,3, 2,9,6, 4,8,1],
-      [3,6,7, 5,4,2, 8,1,9],
-      [9,8,4, 7,6,1, 2,3,5],
-      [5,2,1, 8,3,9, 7,6,4],
-    ];
-  }
-
+  // Inicializar
   for (let i = 0; i < cols; i++) {
     grid[i] = [];
     status[i] = [];
     for (let j = 0; j < rows; j++) {
       grid[i][j] = prefilled[i][j];
-      status[i][j] = "vacio";
       if (prefilled[i][j] !== 0) {
         status[i][j] = "prefilled";
+      } else {
+        status[i][j] = "vacio";
       }
     }
   }
@@ -144,16 +323,16 @@ function createButtons() {
   if (restartButton) restartButton.remove();
 
   backButton = createButton('Atrás');
-  backButton.position(980, 355);
+  backButton.position(400, 50);
   backButton.mousePressed(backToMenu);
-  backButton.style('background-color', '#000000');
+  backButton.style('background-color', '#000');
   backButton.style('border', '2px solid #00FF00');
   backButton.style('color', '#00FF00');
 
   restartButton = createButton('Reiniciar');
-  restartButton.position(980, 415);
+  restartButton.position(530, 50);
   restartButton.mousePressed(restartGame);
-  restartButton.style('background-color', '#000000');
+  restartButton.style('background-color', '#000');
   restartButton.style('border', '2px solid #00FF00');
   restartButton.style('color', '#00FF00');
 }
@@ -183,42 +362,41 @@ function drawMainBorder() {
 }
 
 function drawTimer() {
-  let elapsed = floor((millis() - startTime) / 1000);
-  let minutes = nf(floor(elapsed / 60), 2);
-  let seconds = nf(elapsed % 60, 2);
+  let elapsed = millis() - startTime;
+  let remaining = tiempoMaximo - elapsed;
 
-  // Efecto parpadeo de los dos puntos
-  let showColon = millis() % 1000 < 500 ? ':' : ' ';
-  let timerText = `${minutes}${showColon}${seconds}`;
+  if (!juegoTerminado && remaining <= 0) {
+    juegoTerminado = true;
+    fill('#FF0000');
+    textAlign(CENTER);
+    textSize(26);
+    text("Tiempo terminado. Reinicie el juego.", width / 2, height - 50);
+  }
 
-  // Efecto pulso dinámico
-  let pulse = map(sin(millis() / 500), -1, 1, 180, 255);
+  let seconds = floor(max(remaining, 0) / 1000);
+  let minutes = nf(floor(seconds / 60), 2);
+  let secs = nf(seconds % 60, 2);
+  let timerText = `${minutes}:${secs}`;
 
-  push();
-  fill(0, pulse, 0); // Pulso verde
+  fill('#00FF00');
   textAlign(CENTER);
-  textSize(32);
-
-  // Sombra tipo LED glow
-  drawingContext.shadowBlur = 20;
-  drawingContext.shadowColor = '#00FF00';
-
-  text(`Tiempo ${timerText}`, width / 2.1, 63);
-  pop();
+  textSize(25);
+  text(`Tiempo: ${timerText}`, width / 3, 63);
 }
 
 function drawErrores() {
-  fill('#FF0000');
+  fill('#00FF00');
   textAlign(RIGHT);
-  textSize(30);
-  text(`Errores:`, 840, 60);
-  text(`${errores}`, 800, 90);
+  textSize(20);
+  text(`Errores:`, 830, 290);
+  text(`${errores}`, 800, 320);
 
-  if (errores >= 5) {
-    textSize(26);
+  if (errores >= 5 && !juegoTerminado) {
+    juegoTerminado = true;
     fill('#FF0000');
     textAlign(CENTER);
-    text("Juego terminado. Intentos fallidos al máximo.\nReinicie el juego.", width / 2, height - 50);
+    textSize(26);
+    text("Juego terminado. Máximo de fallos.\nReinicie el juego.", width / 2, height - 50);
   }
 }
 
@@ -282,13 +460,13 @@ function drawGrid() {
 }
 
 function mousePressed() {
-  if (!showBoard || errores >= 5) return;
+  if (!showBoard || errores >= 5 || juegoTerminado) return;
 
   let i = floor((mouseX - marginX) / cellSize);
   let j = floor((mouseY - marginY) / cellSize);
 
   if (i >= 0 && i < cols && j >= 0 && j < rows) {
-    if (prefilled[i][j] === 0) {
+    if (status[i][j] === "vacio") {
       selectedCell.i = i;
       selectedCell.j = j;
     } else {
@@ -299,38 +477,29 @@ function mousePressed() {
 }
 
 function keyPressed() {
-  if (!showBoard || errores >= 5) return;
+  if (!showBoard || errores >= 5 || juegoTerminado) return;
 
   if (selectedCell.i !== -1 && selectedCell.j !== -1) {
-    // Si la celda ya está correcta o prefilled, no se debe modificar ni borrar
-    if (status[selectedCell.i][selectedCell.j] === "correcto" || status[selectedCell.i][selectedCell.j] === "prefilled") {
-      return;
-    }
-
     let n = int(key);
     if (n >= 1 && n <= 9) {
-      grid[selectedCell.i][selectedCell.j] = n;
-
       if (n === solution[selectedCell.i][selectedCell.j]) {
+        grid[selectedCell.i][selectedCell.j] = n;
         status[selectedCell.i][selectedCell.j] = "correcto";
         soundCorrecto.play();
-        // Bloquea celda quitando la selección
-        selectedCell.i = -1;
-        selectedCell.j = -1;
       } else {
-        status[selectedCell.i][selectedCell.j] = "incorrecto";
         soundError.play();
         errores++;
+        status[selectedCell.i][selectedCell.j] = "incorrecto";
       }
     }
-
     if (key === '0' || key === 'Backspace') {
-      grid[selectedCell.i][selectedCell.j] = 0;
-      status[selectedCell.i][selectedCell.j] = "vacio";
+      if (status[selectedCell.i][selectedCell.j] === "incorrecto") {
+        grid[selectedCell.i][selectedCell.j] = 0;
+        status[selectedCell.i][selectedCell.j] = "vacio";
+      }
     }
   }
 }
-
 
 function backToMenu() {
   showBoard = false;
