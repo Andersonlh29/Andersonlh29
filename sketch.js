@@ -514,10 +514,10 @@ function startGame(level) {
     for (let j = 0; j < rows; j++) {
       grid[i][j] = prefilled[i][j];
       if (prefilled[i][j] !== 0) {
-        status[i][j] = "prefilled";
-      } else {
-        status[i][j] = "vacio";
-      }
+  status[i][j] = "prefilled";
+} else {
+  status[i][j] = "vacio";
+}
     }
   }
 
