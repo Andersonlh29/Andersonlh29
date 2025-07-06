@@ -424,13 +424,13 @@ function drawGrid() {
 }
 
 function mousePressed() {
-  if (!showBoard || errores >= 5 || timeOver) return;
+  if (!showBoard || errores >= 5 || gameOverTime) return;
 
   let i = floor((mouseX - marginX) / cellSize);
   let j = floor((mouseY - marginY) / cellSize);
 
   if (i >= 0 && i < cols && j >= 0 && j < rows) {
-    // Permitir solo si no es prefilled y no está correcto
+    // Selecciona solo si NO es prefilled y NO es correcto
     if (status[i][j] !== "prefilled" && status[i][j] !== "correcto") {
       selectedCell.i = i;
       selectedCell.j = j;
@@ -438,12 +438,14 @@ function mousePressed() {
       selectedCell.i = -1;
       selectedCell.j = -1;
     }
+  } else {
+    selectedCell.i = -1;
+    selectedCell.j = -1;
   }
 }
 function keyPressed() {
   if (!showBoard || errores >= 5 || gameOverTime) return;
 
-  // Solo funciona si hay celda seleccionada
   let i = selectedCell.i;
   let j = selectedCell.j;
 
@@ -452,20 +454,18 @@ function keyPressed() {
 
     if (n >= 1 && n <= 9) {
       if (n === solution[i][j]) {
-        // Número correcto → Bloquear
+        // Correcto → guarda y bloquea
         grid[i][j] = n;
         status[i][j] = "correcto";
         soundCorrecto.play();
       } else {
-        // Número incorrecto → No guardar
-        grid[i][j] = 0;
+        // Incorrecto → no guarda, solo suena error y cuenta
         soundError.play();
         errores++;
       }
     }
 
-    if (key === '0' || keyCode === BACKSPACE || keyCode === DELETE) {
-      // Solo borrar si no está correcto
+    if (key === '0' || key === 'Backspace' || keyCode === BACKSPACE || keyCode === DELETE) {
       if (status[i][j] !== "correcto" && status[i][j] !== "prefilled") {
         grid[i][j] = 0;
         status[i][j] = "vacio";
