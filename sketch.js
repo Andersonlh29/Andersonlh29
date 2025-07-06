@@ -144,14 +144,14 @@ function createButtons() {
   if (restartButton) restartButton.remove();
 
   backButton = createButton('Atrás');
-  backButton.position(500, 50);
+  backButton.position(740, 355);
   backButton.mousePressed(backToMenu);
   backButton.style('background-color', '#000000');
   backButton.style('border', '2px solid #00FF00');
   backButton.style('color', '#00FF00');
 
   restartButton = createButton('Reiniciar');
-  restartButton.position(630, 50);
+  restartButton.position(730, 415);
   restartButton.mousePressed(restartGame);
   restartButton.style('background-color', '#000000');
   restartButton.style('border', '2px solid #00FF00');
@@ -203,16 +203,16 @@ function drawTimer() {
   drawingContext.shadowBlur = 20;
   drawingContext.shadowColor = '#00FF00';
 
-  text(`Tiempo ${timerText}`, width / 3, 63);
+  text(`Tiempo ${timerText}`, width / 2.1, 63);
   pop();
 }
 
 function drawErrores() {
-  fill('#00FF00');
+  fill('#FF0000');
   textAlign(RIGHT);
-  textSize(20);
-  text(`Errores:`, 830, 290);
-  text(`${errores}`, 800, 320);
+  textSize(30);
+  text(`Errores:`, 840, 60);
+  text(`${errores}`, 800, 90);
 
   if (errores >= 5) {
     textSize(26);
