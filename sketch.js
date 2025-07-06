@@ -302,6 +302,11 @@ function keyPressed() {
   if (!showBoard || errores >= 5) return;
 
   if (selectedCell.i !== -1 && selectedCell.j !== -1) {
+    // Si la celda ya está marcada como correcta o prefilled, no se puede modificar
+    if (status[selectedCell.i][selectedCell.j] === "correcto" || status[selectedCell.i][selectedCell.j] === "prefilled") {
+      return;
+    }
+
     let n = int(key);
     if (n >= 1 && n <= 9) {
       grid[selectedCell.i][selectedCell.j] = n;
@@ -310,7 +315,7 @@ function keyPressed() {
         status[selectedCell.i][selectedCell.j] = "correcto";
         soundCorrecto.play();
       } else {
-status[selectedCell.i][selectedCell.j] = "incorrecto";
+        status[selectedCell.i][selectedCell.j] = "incorrecto";
         soundError.play();
         errores++;
       }
@@ -322,6 +327,7 @@ status[selectedCell.i][selectedCell.j] = "incorrecto";
     }
   }
 }
+
 
 function backToMenu() {
   showBoard = false;
